@@ -6,7 +6,7 @@ class CustomUser(AbstractUser):
         (1, 'HOD'),
         (2, 'STAFF'),
         (3, 'STUDENT'),
-        (4, 'PARENT'),  # Added Parent user type
+        (4, 'PARENT'),
     )
     user_type = models.CharField(choices=USER, max_length=50, default=1)
     profile_pic = models.ImageField(upload_to='media/profile_pic')
@@ -56,7 +56,7 @@ class Student(models.Model):
 class Parent(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='parents')
-    relationship = models.CharField(max_length=50)  # e.g., Father, Mother
+    relationship = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -100,7 +100,6 @@ class StudyMaterial(models.Model):
         ('assignment', 'Assignment'),
         ('other', 'Other'),
     )
-    
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     file = models.FileField(upload_to='study_materials/')
@@ -143,6 +142,21 @@ class Student_Notification(models.Model):
 
     def __str__(self):
         return f"{self.student_id.admin.first_name} - Notification"
+
+class GeneralNotification(models.Model):
+    TARGET_TYPES = (
+        ('ALL', 'All Users'),
+        ('STAFF', 'All Staff'),
+        ('STUDENT', 'All Students'),
+        ('BOTH', 'Staff and Students'),
+    )
+    target_type = models.CharField(max_length=10, choices=TARGET_TYPES, default='ALL')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='sent_notifications')
+
+    def __str__(self):
+        return f"{self.target_type} Notification - {self.created_at}"
 
 class Staff_leave(models.Model):
     staff_id = models.ForeignKey(Staff, on_delete=models.CASCADE)
@@ -201,7 +215,7 @@ class Attendance(models.Model):
 class Attendance_Report(models.Model):
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     attendance_id = models.ForeignKey(Attendance, on_delete=models.CASCADE)
-    status = models.IntegerField(default=0)  # 0 for absent, 1 for present
+    status = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

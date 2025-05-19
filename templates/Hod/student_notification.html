@@ -13,9 +13,12 @@
                 </ul>
             </div>
             <div class="col-auto text-right float-right ml-auto">
+                <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#sendAllStudentNotificationModal">
+                    Send to All Students
+                </button>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewAllNotificationsModal">
                     View All Notifications
-                </button>
+                </button \</button>
             </div>
         </div>
     </div>
@@ -35,12 +38,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for s in student %} {# Changed loop variable for clarity #}
+                            {% for s in student %}
                                 <tr>
                                     <td>{{s.id}}</td>
                                     <td>
                                         <h2 class="table-avatar">
-                                            <a href="#" class="avatar avatar-sm mr-2"> {# Consider a detail URL if available #}
+                                            <a href="#" class="avatar avatar-sm mr-2">
                                                 {% if s.admin.profile_pic %}
                                                 <img class="avatar-img rounded-circle" src="{{ s.admin.profile_pic.url }}" alt="{{ s.admin.first_name }} {{ s.admin.last_name }}">
                                                 {% else %}
@@ -87,7 +90,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for n_item in notification %} {# Using 'notification' context variable from Hod_Views.STUDENT_SEND_NOTIFICATION #}
+                            {% for n_item in notification %}
                                 <tr>
                                     <td>{{ n_item.student_id.admin.first_name }} {{ n_item.student_id.admin.last_name }}</td>
                                     <td>{{n_item.message}}</td>
@@ -114,7 +117,34 @@
         </div>
     </div>
 
-    {% for s in student %} {# Changed loop variable for clarity #}
+    <div class="modal fade" id="sendAllStudentNotificationModal" tabindex="-1" role="dialog" aria-labelledby="sendAllStudentNotificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sendAllStudentNotificationModalLabel">Send Notification to All Students</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'save_student_notification' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="message-all-students">Message</label>
+                            <textarea class="form-control" name="message" id="message-all-students" rows="3" required></textarea>
+                            <input type="hidden" name="student_id" value="all">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Notification</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for s in student %}
         <div class="modal fade" id="sendNotificationModal-{{s.id}}" tabindex="-1" role="dialog" aria-labelledby="sendNotificationModalLabel-{{s.id}}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
